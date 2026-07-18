@@ -18,7 +18,7 @@
   <script src="./components/footer.js"></script>
 </head>
 
-<body class="min-h-screen bg-base-200 flex flex-col">
+<body class="min-h-screen bg-base-200 flex flex-col overflow-x-hidden">
   <div id="app" class="flex flex-col min-h-screen">
     <app-navbar></app-navbar>
 
@@ -38,34 +38,34 @@
             <span class="badge badge-primary badge-outline">{{ totalCharacters }} 人</span>
           </h2>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
-            <div class="stat bg-base-200 rounded-box p-3">
+            <div class="stat bg-base-200 rounded-box p-3 min-w-0">
               <div class="stat-title text-xs">攻略本</div>
-              <div class="stat-value text-xl sm:text-2xl">{{ fmt(grandTotal.books) }}</div>
+              <div class="stat-value text-lg sm:text-2xl whitespace-normal break-all leading-tight">{{ fmt(grandTotal.books) }}</div>
               <div class="stat-desc">本</div>
             </div>
-            <div class="stat bg-base-200 rounded-box p-3">
+            <div class="stat bg-base-200 rounded-box p-3 min-w-0">
               <div class="stat-title text-xs">甲硬幣</div>
-              <div class="stat-value text-xl sm:text-2xl">{{ fmt(grandTotal.coinTotal) }}</div>
+              <div class="stat-value text-lg sm:text-2xl whitespace-normal break-all leading-tight">{{ fmt(grandTotal.coinTotal) }}</div>
               <div class="stat-desc whitespace-normal break-words leading-tight">升級 {{ fmt(grandTotal.coinFromBooks) }} + 突破 {{ fmt(grandTotal.coinFromBreak) }}</div>
             </div>
-            <div class="stat bg-base-200 rounded-box p-3">
+            <div class="stat bg-base-200 rounded-box p-3 min-w-0">
               <div class="stat-title text-xs">BOSS 材料</div>
-              <div class="stat-value text-xl sm:text-2xl">{{ fmt(grandTotal.BOSS材料) }}</div>
+              <div class="stat-value text-lg sm:text-2xl whitespace-normal break-all leading-tight">{{ fmt(grandTotal.BOSS材料) }}</div>
               <div class="stat-desc">個</div>
             </div>
-            <div class="stat bg-base-200 rounded-box p-3">
+            <div class="stat bg-base-200 rounded-box p-3 min-w-0">
               <div class="stat-title text-xs">幻妄材料<span class="text-success">（綠）</span></div>
-              <div class="stat-value text-xl sm:text-2xl text-success">{{ fmt(grandTotal.幻妄綠) }}</div>
+              <div class="stat-value text-lg sm:text-2xl whitespace-normal break-all leading-tight text-success">{{ fmt(grandTotal.幻妄綠) }}</div>
               <div class="stat-desc">個</div>
             </div>
-            <div class="stat bg-base-200 rounded-box p-3">
+            <div class="stat bg-base-200 rounded-box p-3 min-w-0">
               <div class="stat-title text-xs">幻妄材料<span class="text-info">（藍）</span></div>
-              <div class="stat-value text-xl sm:text-2xl text-info">{{ fmt(grandTotal.幻妄藍) }}</div>
+              <div class="stat-value text-lg sm:text-2xl whitespace-normal break-all leading-tight text-info">{{ fmt(grandTotal.幻妄藍) }}</div>
               <div class="stat-desc">個</div>
             </div>
-            <div class="stat bg-base-200 rounded-box p-3">
+            <div class="stat bg-base-200 rounded-box p-3 min-w-0">
               <div class="stat-title text-xs">幻妄材料<span class="text-purple-400">（紫）</span></div>
-              <div class="stat-value text-xl sm:text-2xl text-purple-400">{{ fmt(grandTotal.幻妄紫) }}</div>
+              <div class="stat-value text-lg sm:text-2xl whitespace-normal break-all leading-tight text-purple-400">{{ fmt(grandTotal.幻妄紫) }}</div>
               <div class="stat-desc">個</div>
             </div>
           </div>
@@ -94,25 +94,25 @@
               <!-- 輸入區 -->
               <div class="lg:col-span-5 grid grid-cols-3 gap-2">
                 <!-- 現有等級 -->
-                <label class="form-control w-full">
+                <label class="form-control w-full min-w-0">
                   <div class="label py-1"><span class="label-text text-xs">現有等級</span></div>
-                  <input type="number" class="input input-bordered input-sm w-full"
+                  <input type="number" class="input input-bordered input-md sm:input-sm w-full text-base"
                     :min="minLevel" :max="maxLevel" step="1"
                     v-model.number="g.current" @change="clampGroup(g)" />
                 </label>
 
                 <!-- 目標等級 -->
-                <label class="form-control w-full">
+                <label class="form-control w-full min-w-0">
                   <div class="label py-1"><span class="label-text text-xs">目標等級</span></div>
-                  <input type="number" class="input input-bordered input-sm w-full"
+                  <input type="number" class="input input-bordered input-md sm:input-sm w-full text-base"
                     :min="minLevel" :max="maxLevel" step="1"
                     v-model.number="g.target" @change="clampGroup(g)" />
                 </label>
 
                 <!-- 人數 -->
-                <label class="form-control w-full">
+                <label class="form-control w-full min-w-0">
                   <div class="label py-1"><span class="label-text text-xs">人數</span></div>
-                  <input type="number" class="input input-bordered input-sm w-full"
+                  <input type="number" class="input input-bordered input-md sm:input-sm w-full text-base"
                     min="1" step="1"
                     v-model.number="g.count" @change="clampGroup(g)" />
                 </label>
@@ -121,23 +121,23 @@
               <!-- 該組結果 -->
               <div class="lg:col-span-7">
                 <div v-if="results[idx].valid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
-                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1">
-                    <span class="text-base-content/70">攻略本</span><span class="font-semibold whitespace-nowrap">{{ fmt(results[idx].books) }}</span>
+                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1 min-w-0">
+                    <span class="text-base-content/70">攻略本</span><span class="font-semibold break-all text-right">{{ fmt(results[idx].books) }}</span>
                   </div>
-                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1">
-                    <span class="text-base-content/70">甲硬幣</span><span class="font-semibold whitespace-nowrap">{{ fmt(results[idx].coinTotal) }}</span>
+                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1 min-w-0">
+                    <span class="text-base-content/70">甲硬幣</span><span class="font-semibold break-all text-right">{{ fmt(results[idx].coinTotal) }}</span>
                   </div>
-                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1">
-                    <span class="text-base-content/70">BOSS材料</span><span class="font-semibold whitespace-nowrap">{{ fmt(results[idx].BOSS材料) }}</span>
+                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1 min-w-0">
+                    <span class="text-base-content/70">BOSS材料</span><span class="font-semibold break-all text-right">{{ fmt(results[idx].BOSS材料) }}</span>
                   </div>
-                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1">
-                    <span class="text-success">幻妄綠</span><span class="font-semibold text-success whitespace-nowrap">{{ fmt(results[idx].幻妄綠) }}</span>
+                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1 min-w-0">
+                    <span class="text-success">幻妄綠</span><span class="font-semibold text-success break-all text-right">{{ fmt(results[idx].幻妄綠) }}</span>
                   </div>
-                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1">
-                    <span class="text-info">幻妄藍</span><span class="font-semibold text-info whitespace-nowrap">{{ fmt(results[idx].幻妄藍) }}</span>
+                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1 min-w-0">
+                    <span class="text-info">幻妄藍</span><span class="font-semibold text-info break-all text-right">{{ fmt(results[idx].幻妄藍) }}</span>
                   </div>
-                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1">
-                    <span class="text-purple-400">幻妄紫</span><span class="font-semibold text-purple-400 whitespace-nowrap">{{ fmt(results[idx].幻妄紫) }}</span>
+                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1 min-w-0">
+                    <span class="text-purple-400">幻妄紫</span><span class="font-semibold text-purple-400 break-all text-right">{{ fmt(results[idx].幻妄紫) }}</span>
                   </div>
                 </div>
                 <div v-else class="alert alert-warning py-2 text-xs">
