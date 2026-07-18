@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>異環 NTE 素材計算器 · 角色升級</title>
+
+  <!-- 為了免伺服器：全部走 CDN，以傳統 <script>/<link> 載入 -->
+  <!-- DaisyUI + Tailwind -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Vue 3 global build -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.4.38/dist/vue.global.prod.js"></script>
+
+  <!-- 資料與計算、元件（掛在 window.NTE） -->
+  <script src="./data/charUpgrade.js"></script>
+  <script src="./components/navbar.js"></script>
+  <script src="./components/footer.js"></script>
+</head>
+
+<body class="min-h-screen bg-base-200 flex flex-col">
+  <div id="app" class="flex flex-col min-h-screen">
+    <app-navbar></app-navbar>
+
+    <main class="container mx-auto px-4 py-6 flex-1 w-full max-w-5xl">
+      <div class="mb-6">
+        <h1 class="text-2xl sm:text-3xl font-bold">角色升級素材計算</h1>
+        <p class="text-base-content/70 mt-1 text-sm">
+          設定每組的「現有等級、目標等級、人數」，即可估算所需素材；可新增多組一次計算。
+        </p>
+      </div>
+
+      <!-- 全部合計 -->
+      <div class="card bg-base-100 shadow-md mb-6 border border-primary/20">
+        <div class="card-body">
+          <h2 class="card-title text-lg">
+            全部角色合計
+            <span class="badge badge-primary badge-outline">{{ totalCharacters }} 人</span>
+          </h2>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
+            <div class="stat bg-base-200 rounded-box p-3">
+              <div class="stat-title text-xs">攻略本</div>
+              <div class="stat-value text-xl sm:text-2xl">{{ fmt(grandTotal.books) }}</div>
+              <div class="stat-desc">本</div>
+            </div>
+            <div class="stat bg-base-200 rounded-box p-3">
+              <div class="stat-title text-xs">甲硬幣</div>
+              <div class="stat-value text-xl sm:text-2xl">{{ fmt(grandTotal.coinTotal) }}</div>
+              <div class="stat-desc whitespace-normal break-words leading-tight">升級 {{ fmt(grandTotal.coinFromBooks) }} + 突破 {{ fmt(grandTotal.coinFromBreak) }}</div>
+            </div>
+            <div class="stat bg-base-200 rounded-box p-3">
+              <div class="stat-title text-xs">BOSS 材料</div>
+              <div class="stat-value text-xl sm:text-2xl">{{ fmt(grandTotal.BOSS材料) }}</div>
+              <div class="stat-desc">個</div>
+            </div>
+            <div class="stat bg-base-200 rounded-box p-3">
+              <div class="stat-title text-xs">幻妄材料<span class="text-success">（綠）</span></div>
+              <div class="stat-value text-xl sm:text-2xl text-success">{{ fmt(grandTotal.幻妄綠) }}</div>
+              <div class="stat-desc">個</div>
+            </div>
+            <div class="stat bg-base-200 rounded-box p-3">
+              <div class="stat-title text-xs">幻妄材料<span class="text-info">（藍）</span></div>
+              <div class="stat-value text-xl sm:text-2xl text-info">{{ fmt(grandTotal.幻妄藍) }}</div>
+              <div class="stat-desc">個</div>
+            </div>
+            <div class="stat bg-base-200 rounded-box p-3">
+              <div class="stat-title text-xs">幻妄材料<span class="text-purple-400">（紫）</span></div>
+              <div class="stat-value text-xl sm:text-2xl text-purple-400">{{ fmt(grandTotal.幻妄紫) }}</div>
+              <div class="stat-desc">個</div>
+            </div>
+          </div>
+          <p class="text-xs text-base-content/50 mt-2">
+            合計所需經驗：{{ fmt(grandTotal.exp) }}（攻略本以無條件進位整本計，每本連帶 {{ fmt(coinPerBook) }} 甲硬幣）
+          </p>
+        </div>
+      </div>
+
+      <!-- 各組別 -->
+      <div class="space-y-4">
+        <div v-for="(g, idx) in groups" :key="g.id" class="card bg-base-100 shadow-sm">
+          <div class="card-body p-4 sm:p-5">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold text-base">第 {{ idx + 1 }} 組</h3>
+              <button
+                class="btn btn-ghost btn-sm text-error"
+                :disabled="groups.length === 1"
+                @click="removeGroup(idx)"
+                title="刪除此組">
+                ✕ 刪除
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+              <!-- 輸入區 -->
+              <div class="lg:col-span-5 grid grid-cols-3 gap-2">
+                <!-- 現有等級 -->
+                <label class="form-control w-full">
+                  <div class="label py-1"><span class="label-text text-xs">現有等級</span></div>
+                  <input type="number" class="input input-bordered input-sm w-full"
+                    :min="minLevel" :max="maxLevel" step="1"
+                    v-model.number="g.current" @change="clampGroup(g)" />
+                </label>
+
+                <!-- 目標等級 -->
+                <label class="form-control w-full">
+                  <div class="label py-1"><span class="label-text text-xs">目標等級</span></div>
+                  <input type="number" class="input input-bordered input-sm w-full"
+                    :min="minLevel" :max="maxLevel" step="1"
+                    v-model.number="g.target" @change="clampGroup(g)" />
+                </label>
+
+                <!-- 人數 -->
+                <label class="form-control w-full">
+                  <div class="label py-1"><span class="label-text text-xs">人數</span></div>
+                  <input type="number" class="input input-bordered input-sm w-full"
+                    min="1" step="1"
+                    v-model.number="g.count" @change="clampGroup(g)" />
+                </label>
+              </div>
+
+              <!-- 該組結果 -->
+              <div class="lg:col-span-7">
+                <div v-if="results[idx].valid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
+                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1">
+                    <span class="text-base-content/70">攻略本</span><span class="font-semibold whitespace-nowrap">{{ fmt(results[idx].books) }}</span>
+                  </div>
+                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1">
+                    <span class="text-base-content/70">甲硬幣</span><span class="font-semibold whitespace-nowrap">{{ fmt(results[idx].coinTotal) }}</span>
+                  </div>
+                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1">
+                    <span class="text-base-content/70">BOSS材料</span><span class="font-semibold whitespace-nowrap">{{ fmt(results[idx].BOSS材料) }}</span>
+                  </div>
+                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1">
+                    <span class="text-success">幻妄綠</span><span class="font-semibold text-success whitespace-nowrap">{{ fmt(results[idx].幻妄綠) }}</span>
+                  </div>
+                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1">
+                    <span class="text-info">幻妄藍</span><span class="font-semibold text-info whitespace-nowrap">{{ fmt(results[idx].幻妄藍) }}</span>
+                  </div>
+                  <div class="flex justify-between gap-1 bg-base-200 rounded px-2 py-1">
+                    <span class="text-purple-400">幻妄紫</span><span class="font-semibold text-purple-400 whitespace-nowrap">{{ fmt(results[idx].幻妄紫) }}</span>
+                  </div>
+                </div>
+                <div v-else class="alert alert-warning py-2 text-xs">
+                  目標等級需大於現有等級
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-outline mt-4 w-full sm:w-auto" @click="addGroup">
+        ＋ 新增組別
+      </button>
+    </main>
+
+    <app-footer></app-footer>
+  </div>
+
+  <script>
+    const { createApp, ref, computed } = Vue;
+    const NTE = window.NTE;
+
+    createApp({
+      components: {
+        'app-navbar': NTE.components.Navbar,
+        'app-footer': NTE.components.Footer,
+      },
+      setup() {
+        let nextId = 1;
+        const makeGroup = (current = 1, target = 20, count = 1) => ({ id: nextId++, current, target, count });
+
+        const groups = ref([makeGroup()]);
+
+        const minLevel = NTE.MIN_LEVEL;
+        const maxLevel = NTE.MAX_LEVEL;
+        const coinPerBook = NTE.COIN_PER_BOOK;
+
+        const clampInt = (v, min, max) => {
+          let n = Math.floor(Number(v));
+          if (!Number.isFinite(n)) n = min;
+          if (n < min) n = min;
+          if (max != null && n > max) n = max;
+          return n;
+        };
+
+        const clampGroup = (g) => {
+          g.current = clampInt(g.current, minLevel, maxLevel);
+          g.target = clampInt(g.target, minLevel, maxLevel);
+          g.count = clampInt(g.count, 1, null);
+        };
+
+        const addGroup = () => groups.value.push(makeGroup());
+        const removeGroup = (idx) => {
+          if (groups.value.length > 1) groups.value.splice(idx, 1);
+        };
+
+        // 每組結果（單人 × 人數）
+        const results = computed(() =>
+          groups.value.map((g) => {
+            const valid = g.target > g.current;
+            const one = NTE.calcOne(g.current, g.target);
+            const count = g.count > 0 ? g.count : 0;
+            return {
+              valid,
+              exp: one.exp * count,
+              books: one.books * count,
+              coinFromBooks: one.coinFromBooks * count,
+              coinFromBreak: one.coinFromBreak * count,
+              coinTotal: one.coinTotal * count,
+              幻妄綠: one.幻妄綠 * count,
+              幻妄藍: one.幻妄藍 * count,
+              幻妄紫: one.幻妄紫 * count,
+              BOSS材料: one.BOSS材料 * count,
+            };
+          })
+        );
+
+        // 全部合計
+        const grandTotal = computed(() =>
+          results.value.reduce(
+            (acc, r) => {
+              acc.exp += r.exp;
+              acc.books += r.books;
+              acc.coinFromBooks += r.coinFromBooks;
+              acc.coinFromBreak += r.coinFromBreak;
+              acc.coinTotal += r.coinTotal;
+              acc.幻妄綠 += r.幻妄綠;
+              acc.幻妄藍 += r.幻妄藍;
+              acc.幻妄紫 += r.幻妄紫;
+              acc.BOSS材料 += r.BOSS材料;
+              return acc;
+            },
+            { exp: 0, books: 0, coinFromBooks: 0, coinFromBreak: 0, coinTotal: 0, 幻妄綠: 0, 幻妄藍: 0, 幻妄紫: 0, BOSS材料: 0 }
+          )
+        );
+
+        const totalCharacters = computed(() =>
+          groups.value.reduce((sum, g) => sum + (g.count > 0 ? g.count : 0), 0)
+        );
+
+        const fmt = (n) => Number(n || 0).toLocaleString('en-US');
+
+        return {
+          groups, results, grandTotal, totalCharacters,
+          minLevel, maxLevel, coinPerBook,
+          addGroup, removeGroup, clampGroup, fmt,
+        };
+      },
+    }).mount('#app');
+  </script>
+</body>
+</html>
