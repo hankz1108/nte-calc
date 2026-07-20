@@ -39,7 +39,7 @@
             合併總計
             <span class="badge badge-primary badge-outline">角色 {{ char.totalCount }} · 弧盤 {{ disc.totalCount }}</span>
           </h2>
-          <p class="text-xs text-base-content/50 -mt-1">共用素材（甲硬幣、殘渣）為角色＋弧盤加總；其餘為各自獨有。</p>
+          <p class="text-xs text-base-content/50 -mt-1">攻略本與染劑皆用紫色的進行計算所需數量與消耗的甲硬幣。</p>
 
           <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
             <div class="stat bg-base-200 rounded-box p-3 min-w-0">
@@ -52,18 +52,18 @@
               <div class="stat-value text-lg sm:text-2xl whitespace-normal break-all leading-tight">{{ fmt(char.grandTotal.books) }}</div>
               <div class="stat-desc">本</div>
             </div>
+              <div class="stat bg-base-200 rounded-box p-3 min-w-0">
+              <div class="stat-title text-xs">染劑<span class="text-base-content/50">（武器經驗）</span></div>
+              <div class="stat-value text-lg sm:text-2xl whitespace-normal break-all leading-tight">{{ fmt(disc.grandTotal.dyes) }}</div>
+              <div class="stat-desc">個</div>
+            </div>
             <div class="stat bg-base-200 rounded-box p-3 min-w-0">
               <div class="stat-title text-xs">BOSS 材料</div>
               <div class="stat-value text-lg sm:text-2xl whitespace-normal break-all leading-tight">{{ fmt(char.grandTotal.BOSS材料) }}</div>
               <div class="stat-desc">個</div>
             </div>
-            <div class="stat bg-base-200 rounded-box p-3 min-w-0">
-              <div class="stat-title text-xs">染劑<span class="text-base-content/50">（武器經驗）</span></div>
-              <div class="stat-value text-lg sm:text-2xl whitespace-normal break-all leading-tight">{{ fmt(disc.grandTotal.dyes) }}</div>
-              <div class="stat-desc">個</div>
-            </div>
             <div class="bg-base-200 rounded-box p-3 min-w-0 col-span-2 md:col-span-1">
-              <div class="text-xs text-base-content/70 mb-2">殘渣材料</div>
+              <div class="text-xs text-base-content/70 mb-2">殘渣材料<span class="text-base-content/50">（小怪掉落）</span></div>
               <div class="grid grid-cols-3 gap-2">
                 <div class="min-w-0">
                   <div class="text-xs text-success">綠</div>
@@ -80,7 +80,7 @@
               </div>
             </div>
             <div class="bg-base-200 rounded-box p-3 min-w-0 col-span-2 md:col-span-1">
-              <div class="text-xs text-base-content/70 mb-2">罐頭<span class="text-base-content/50">（弧盤）</span></div>
+              <div class="text-xs text-base-content/70 mb-2">罐頭<span class="text-base-content/50">（弧盤突破）</span></div>
               <div class="grid grid-cols-3 gap-2">
                 <div class="min-w-0">
                   <div class="text-xs text-success">綠</div>
